@@ -1319,6 +1319,8 @@
 </div>
 
 
+<div class="diary-toast" id="toast"></div>
+
 <script>
 
 // ── 날짜 초기화 ──
@@ -1748,20 +1750,37 @@ function clearShapeCanvas() {
 function checkShapeAccuracy() {
   if (userPath.length < 20) { showToast('조금 더 그려주세요 ✏️'); return; }
   const w = shapeCanvas.width, h = shapeCanvas.height;
-  const guide = getShapePath(currentShape, w, h);
-  let totalDist = 0, count = 0;
-  userPath.forEach(up => {
-    let minD = Infinity;
-    guide.forEach(gp => {
-      const d = Math.hypot(up.x - gp.x, up.y - gp.y);
-      if (d < minD) minD = d;
-    });
-    totalDist += minD;
-    count++;
-  });
-  const avgDist = totalDist / count;
-  const maxDist = Math.min(w, h) * 0.5;
-  const accuracy = Math.max(0, Math.round((1 - avgDist / maxDist) * 100));
+  // 안내선과 내가 그린 선을 촘촘한 점으로 나눠서 비교합니다
+  const densify = (pts, step) => {
+    const out = [];
+    for (let k = 0; k < pts.length - 1; k++) {
+      const a = pts[k], b = pts[k + 1];
+      const n = Math.max(1, Math.ceil(Math.hypot(b.x - a.x, b.y - a.y) / step));
+      for (let m = 0; m < n; m++) out.push({ x: a.x + (b.x - a.x) * m / n, y: a.y + (b.y - a.y) * m / n });
+    }
+    out.push(pts[pts.length - 1]);
+    return out;
+  };
+  const nearest = (p, arr) => {
+    let m = Infinity;
+    for (let k = 0; k < arr.length; k++) {
+      const d = Math.hypot(p.x - arr[k].x, p.y - arr[k].y);
+      if (d < m) m = d;
+    }
+    return m;
+  };
+  const guide = densify(getShapePath(currentShape, w, h), 6);
+  const mine  = densify(userPath, 6);
+  const scale = Math.min(w, h);
+  // 1) 정확도: 내가 그은 선이 안내선에서 얼마나 가까운가
+  let totalDist = 0;
+  mine.forEach(up => { totalDist += nearest(up, guide); });
+  const precision = Math.max(0, 1 - (totalDist / mine.length) / (scale * 0.2));
+  // 2) 완성도: 안내선을 얼마나 빠짐없이 따라갔는가
+  let covered = 0;
+  guide.forEach(gp => { if (nearest(gp, mine) < scale * 0.1) covered++; });
+  const coverage = covered / guide.length;
+  const accuracy = Math.round(precision * coverage * 100);
 
   shapeStats.tries++;
   document.getElementById('shapeTryCount').textContent = shapeStats.tries;
@@ -1813,7 +1832,7 @@ let mazeFinished   = false;
 let showTrail      = true;
 
 // 드로우 상태
-let isDrawing      = false;
+let mazeDrawing      = false;
 let drawPath       = [];      // 화면 좌표 경로
 let visitedCells   = [];      // 방문한 셀 [{x,y}]
 let lastCell       = null;
@@ -1863,7 +1882,7 @@ function generateMaze() {
   mazeTimerVal  = 0;
   mazeRunning   = false;
   mazeFinished  = false;
-  isDrawing     = false;
+  mazeDrawing     = false;
   drawPath      = [];
   visitedCells  = [];
   lastCell      = null;
@@ -2045,13 +2064,13 @@ function onDrawStart(e) {
   }
   document.getElementById('mazeHint').textContent = '✏️ 그대로 손가락을 떼지 말고 이동하세요!';
 
-  isDrawing = true;
+  mazeDrawing = true;
   drawPath  = [{ cx, cy }];
   lastCell  = { ...playerPos };
 }
 
 function onDrawMove(e) {
-  if (!isDrawing || mazeFinished) return;
+  if (!mazeDrawing || mazeFinished) return;
   e.preventDefault();
   const { cx, cy } = getPos(e);
   drawPath.push({ cx, cy });
@@ -2067,9 +2086,9 @@ function onDrawMove(e) {
 }
 
 function onDrawEnd(e) {
-  if (!isDrawing) return;
+  if (!mazeDrawing) return;
   e.preventDefault();
-  isDrawing = false;
+  mazeDrawing = false;
   if (!mazeFinished) {
     document.getElementById('mazeHint').textContent = '✏️ 😊 캐릭터에서 다시 시작하세요!';
   }
