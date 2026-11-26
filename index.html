@@ -3,9 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#F8F4EC">
 <title>마음돌봄 - 치매 예방 케어 앱</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=Noto+Serif+KR:wght@600;700&display=swap');
 
   :root {
     --sky: #D6EEFF;
@@ -714,7 +715,7 @@
     margin-bottom: 18px;
     border-radius: 18px;
     overflow: hidden;
-    background: #F8FDFF;
+    background: #FFFDF8;
     border: 3px solid #B8DFF0;
     touch-action: none;
   }
@@ -975,37 +976,294 @@
   }
   .status-badge .sb-icon { font-size: 20px; display: block; margin-bottom: 4px; }
 
+
+  /* ─────────────────────────────
+     7. 오늘의 칭찬과 정리
+  ───────────────────────────── */
+  .finish-card {
+    background: linear-gradient(135deg, #FFF8E7, #FFEFC9);
+    border: 3px solid var(--amber);
+    border-radius: 22px;
+    padding: 20px 22px;
+    margin-bottom: 20px;
+  }
+  .fc-top { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
+  .fc-count { font-size: 30px; font-weight: 900; color: #B87400; }
+  .fc-msg { font-size: 17px; font-weight: 700; color: var(--ink); text-align: right; line-height: 1.4; }
+  .fc-bar { background: #FFE2A0; border-radius: 50px; height: 14px; overflow: hidden; margin-bottom: 14px; }
+  .fc-bar-fill { height: 100%; width: 0; background: linear-gradient(90deg, #F5A623, #E8624A); border-radius: 50px; transition: width .5s ease; }
+  .btn-finish {
+    width: 100%; padding: 18px; font-family: 'Noto Sans KR', sans-serif; font-size: 20px; font-weight: 700;
+    color: #fff; background: linear-gradient(135deg, #F5A623, #E08A00); border: none; border-radius: 16px;
+    cursor: pointer; box-shadow: 0 4px 14px rgba(245,166,35,0.35);
+  }
+  .btn-finish:active { transform: scale(0.97); }
+
+  .finish-overlay {
+    position: fixed; inset: 0; z-index: 1000; display: none;
+    background: rgba(20, 40, 70, 0.55); align-items: center; justify-content: center; padding: 16px;
+  }
+  .finish-overlay.show { display: flex; }
+  .finish-sheet {
+    position: relative; z-index: 2; width: 100%; max-width: 520px; max-height: 92vh; overflow-y: auto;
+    background: #fff; border-radius: 28px; padding: 28px 22px 24px; text-align: center;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.25);
+  }
+  .fs-emoji { font-size: 72px; line-height: 1; }
+  .fs-title { font-size: 28px; font-weight: 900; margin: 12px 0 8px; color: var(--ink); line-height: 1.35; }
+  .fs-praise { font-size: 20px; color: var(--ink-soft); line-height: 1.6; margin-bottom: 18px; }
+  .fs-date { font-size: 15px; font-weight: 700; color: #2C6FAC; margin-bottom: 6px; }
+  .fs-list { text-align: left; display: flex; flex-direction: column; gap: 10px; margin-bottom: 18px; }
+  .fs-row { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 16px; background: #F4F7FB; border: 2px solid #E0EAF5; }
+  .fs-row.done { background: var(--green-light); border-color: var(--green); }
+  .fs-row .fs-ico { font-size: 28px; flex-shrink: 0; }
+  .fs-row .fs-txt { flex: 1; min-width: 0; }
+  .fs-row .fs-name { font-size: 17px; font-weight: 700; color: var(--ink); }
+  .fs-row .fs-res { font-size: 15px; color: var(--ink-soft); margin-top: 2px; word-break: keep-all; overflow-wrap: anywhere; }
+  .fs-row .fs-mark { font-size: 24px; flex-shrink: 0; }
+  .fs-go {
+    flex-shrink: 0; padding: 10px 14px; border-radius: 12px; border: 2px solid #2C6FAC; background: #fff;
+    font-family: 'Noto Sans KR', sans-serif; font-size: 15px; font-weight: 700; color: #2C6FAC; cursor: pointer;
+  }
+  .fs-week-title { font-size: 16px; font-weight: 700; color: var(--ink-soft); margin-bottom: 8px; }
+  .fs-week { display: flex; justify-content: space-between; gap: 6px; margin-bottom: 6px; }
+  .fs-day { flex: 1; text-align: center; padding: 8px 0; border-radius: 12px; background: #F4F7FB; }
+  .fs-day.full { background: #FFF1CC; }
+  .fs-day .d { font-size: 13px; color: var(--ink-soft); font-weight: 700; }
+  .fs-day .s { font-size: 22px; margin-top: 2px; }
+  .fs-week-sum { font-size: 15px; color: var(--ink-soft); margin-bottom: 18px; }
+  .fs-bye { font-size: 19px; font-weight: 700; color: #2C6FAC; line-height: 1.6; margin-bottom: 18px; }
+  .fs-note { font-size: 14px; color: #8A9BAC; margin-bottom: 14px; }
+
+  .confetti { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 1; }
+  .confetti span { position: absolute; top: -40px; font-size: 28px; animation: confettiFall linear forwards; }
+  @keyframes confettiFall { to { transform: translateY(110vh) rotate(360deg); opacity: 0.9; } }
+  @media (prefers-reduced-motion: reduce) { .confetti { display: none; } .fc-bar-fill { transition: none; } }
+
+/* ═══════════════════════════════════════════
+   리디자인 — 차분하고 품위 있는 디자인
+   (기능은 그대로, 색·글꼴·간격만 바꿉니다)
+═══════════════════════════════════════════ */
+:root {
+  --bg:#F8F4EC; --card:#FFFFFF; --ink:#1F2D2B; --ink-soft:#5B6663; --line:#E6DDCC;
+  --primary:#1F5F5B; --primary-dark:#174B48; --primary-soft:#E3EFED;
+  --sky:#F3EEE3; --sky-dark:#DDD3BF;
+  --green:#3F7D4E; --green-light:#E7F1E8;
+  --amber:#B9791A; --amber-light:#FBF0DA;
+  --coral:#B5483D; --coral-light:#F9E5E2;
+  --purple:#7C5A8C; --purple-light:#EFE7F3; --purple-dark:#654673;
+  --teal:#2C7F78; --teal-light:#E2F1EF; --teal-dark:#1F5F5B;
+  --rose:#B2574C; --rose-light:#F7E6E3;
+  --shadow:0 2px 12px rgba(70,55,30,.08);
+  --radius:20px;
+  --serif:'Noto Serif KR','Noto Serif CJK KR','Noto Sans KR',serif;
+  --acc:#1F5F5B; --acc-soft:#E3EFED;
+}
+#panel-home { --acc:#1F5F5B; --acc-soft:#E3EFED; }
+#panel-sleep { --acc:#46698C; --acc-soft:#E6EEF6; }
+#panel-game  { --acc:#B07A1F; --acc-soft:#F7EEDC; }
+#panel-diary { --acc:#5A7D57; --acc-soft:#E8F0E6; }
+#panel-med   { --acc:#7C5A8C; --acc-soft:#EFE7F3; }
+#panel-shape { --acc:#2C7F78; --acc-soft:#E2F1EF; }
+#panel-maze  { --acc:#B2574C; --acc-soft:#F7E6E3; }
+
+body { background:var(--bg); color:var(--ink); padding-bottom:108px; -webkit-font-smoothing:antialiased; }
+
+/* 상단 */
+.app-header { background:var(--bg); color:var(--ink); text-align:left; padding:22px 20px 2px; }
+.app-header h1 { font-family:var(--serif); font-size:28px; font-weight:700; color:var(--primary); letter-spacing:-0.5px; display:flex; align-items:center; gap:10px; }
+.app-header h1 .logo { width:30px; height:30px; flex-shrink:0; }
+.app-header .subtitle { font-size:16px; color:var(--ink-soft); margin-top:4px; opacity:1; font-weight:400; }
+.header-date { font-size:15px; color:var(--ink-soft); margin-top:2px; opacity:1; }
+
+/* 하단 탭 */
+.tab-bar { position:fixed; left:0; right:0; bottom:0; margin:0; border-radius:0; background:#fff; border-top:1px solid var(--line);
+  box-shadow:0 -4px 18px rgba(60,50,30,.07); z-index:50; padding-bottom:env(safe-area-inset-bottom,0); overflow:visible; }
+.tab-btn { padding:10px 2px 8px; font-size:13px; font-weight:700; color:#7C8783; border-bottom:none; gap:4px; background:transparent; }
+.tab-btn .tab-icon { display:block; width:26px; height:26px; font-size:0; }
+.tab-btn .tab-icon svg { width:100%; height:100%; }
+.tab-btn.active { background:transparent; color:var(--primary); border-bottom:none; box-shadow:inset 0 3px 0 var(--primary); }
+
+.panel { padding:16px 16px 24px; }
+
+/* 카드·제목 */
+.card { border-radius:var(--radius); border:1px solid var(--line); box-shadow:var(--shadow); padding:24px 20px; background:#fff; }
+.card-title { font-family:var(--serif); font-size:23px; font-weight:700; color:var(--ink); margin-bottom:18px; }
+
+/* 홈: 오늘의 꽃 */
+.hero { margin:0 0 16px; border-radius:22px; overflow:hidden; background:#E9E1D1; box-shadow:var(--shadow); border:1px solid var(--line); }
+.hero img { display:block; width:100%; aspect-ratio:16/10; object-fit:cover; }
+.hero figcaption { padding:12px 18px; font-size:16px; color:var(--ink-soft); background:#fff; }
+.hero figcaption b { color:var(--ink); font-family:var(--serif); font-weight:700; }
+.home-greeting { text-align:left; padding:2px 4px 16px; }
+.home-greeting h2 { font-family:var(--serif); font-size:30px; font-weight:700; color:var(--ink); margin-top:0; letter-spacing:-0.5px; }
+.home-greeting p { font-size:19px; color:var(--ink-soft); margin-top:6px; }
+
+/* 홈: 달성 현황 */
+.daily-status { background:#fff; border:1px solid var(--line); border-radius:var(--radius); padding:18px; box-shadow:var(--shadow); margin-bottom:16px; }
+.daily-status h3 { font-family:var(--serif); font-size:19px; color:var(--ink); margin-bottom:12px; }
+.status-row { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+.status-badge { position:relative; background:#FAF7F0; border:1.5px solid var(--line); border-radius:14px; padding:12px 4px 10px; font-size:14px; font-weight:700; color:#7C8783; text-align:center; flex:none; }
+.status-badge .sb-icon { display:block; width:26px; height:26px; margin:0 auto 6px; color:#8A9591; font-size:0; }
+.status-badge .sb-icon svg { width:100%; height:100%; }
+.status-badge.done { background:var(--green-light); border-color:var(--green); color:var(--green); }
+.status-badge.done .sb-icon { color:var(--green); }
+.status-badge.done::after { content:'✓'; position:absolute; top:6px; right:7px; width:18px; height:18px; border-radius:50%; background:var(--green); color:#fff; font-size:12px; line-height:18px; text-align:center; }
+
+/* 홈: 오늘 하루 정리 카드 */
+.finish-card { background:#FBF3E2; border:1px solid #E8D5A8; border-radius:var(--radius); box-shadow:var(--shadow); }
+.fc-count { font-family:var(--serif); color:#8A5A0B; }
+.fc-bar { background:#EFDDB0; }
+.fc-bar-fill { background:linear-gradient(90deg,#C99A2E,#B9791A); }
+.btn-finish { background:var(--primary); box-shadow:none; border-radius:14px; }
+
+/* 홈: 메뉴 카드 */
+.home-cards { display:flex; flex-direction:column; gap:12px; }
+.home-card { background:#fff; border:1px solid var(--line); border-radius:var(--radius); padding:16px 18px; box-shadow:var(--shadow); display:flex; align-items:center; gap:16px; }
+.home-card .hc-icon { width:58px; height:58px; border-radius:16px; background:var(--soft); color:var(--acc); display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:0; }
+.home-card .hc-icon svg { width:30px; height:30px; }
+.home-card .hc-text h3 { font-family:var(--serif); font-size:21px; font-weight:700; color:var(--ink); }
+.home-card .hc-text p { font-size:16px; color:var(--ink-soft); margin-top:4px; }
+.home-card .hc-arrow { color:#B9B2A3; font-size:28px; }
+
+/* 버튼 */
+.btn-primary, .btn-save, .btn-purple, .btn-teal, .btn-rose { background:var(--acc); box-shadow:none; border-radius:14px; }
+.btn-secondary, .btn-outline-teal { color:var(--acc); border-color:var(--acc); background:#fff; border-radius:14px; }
+
+/* 수면 */
+.sleep-input-wrap label { color:var(--ink-soft); }
+.sleep-input-wrap input[type="time"] { font-family:var(--serif); background:var(--acc-soft); border:2px solid var(--acc); border-radius:14px; color:var(--ink); }
+.sleep-input-wrap input[type="time"]:focus { background:#fff; border-color:var(--acc); }
+.result-emoji { width:60px; height:60px; margin:0 auto 12px; font-size:0; }
+.result-emoji svg { width:100%; height:100%; }
+.sleep-result.success .result-emoji { color:var(--green); }
+.sleep-result.warn .result-emoji { color:var(--amber); }
+.sleep-result .result-hours { font-family:var(--serif); }
+.sleep-tip { background:var(--acc-soft); }
+.sleep-tip strong { color:var(--acc); }
+
+/* 계산 게임 */
+.score-item { background:var(--acc-soft); }
+.score-item .score-num { font-family:var(--serif); }
+.diff-btn.active { border-color:var(--acc); background:var(--acc-soft); color:var(--acc); }
+.question-box { background:var(--acc-soft); }
+.question-text { font-family:var(--serif); }
+.answer-display { background:var(--sky); font-family:var(--serif); }
+.num-btn { background:#fff; border:1.5px solid var(--line); font-family:var(--serif); color:var(--ink); box-shadow:none; }
+.num-btn:active { background:var(--acc-soft); }
+.num-btn.del { background:var(--coral-light); border-color:#EBC5BE; color:var(--coral); }
+.num-btn.check { background:var(--primary); border-color:var(--primary); color:#fff; }
+
+/* 일기 */
+.diary-date { color:var(--acc); font-family:var(--serif); }
+.line-num { background:var(--acc); font-family:var(--serif); }
+.diary-line-wrap textarea { background:#fff; border:2px solid var(--line); border-radius:14px; }
+.diary-line-wrap textarea:focus { background:#fff; border-color:var(--acc); }
+.diary-line-wrap textarea::placeholder { color:#A6A08F; }
+.history-entry { background:var(--sky); border-left-color:var(--acc); }
+.history-title { font-family:var(--serif); }
+
+/* 약 */
+.med-add-row input[type="text"] { background:#fff; border:2px solid var(--line); border-radius:14px; }
+.med-add-row input[type="text"]:focus { border-color:var(--acc); }
+.med-add-row input[type="text"]::placeholder { color:#A6A08F; }
+.time-btn.active { border-color:var(--acc); background:var(--acc-soft); color:var(--acc); }
+.med-progress-bar { background:var(--acc); }
+.med-empty { color:#A6A08F; }
+.med-empty-icon { width:48px; height:48px; margin:0 auto 12px; display:block; color:#C9BFD3; font-size:0 !important; }
+.med-empty-icon svg { width:100%; height:100%; }
+.done-emoji, .mc-emoji { width:52px; height:52px; margin:0 auto 10px; display:block; font-size:0 !important; }
+.done-emoji svg, .mc-emoji svg { width:100%; height:100%; }
+.med-all-done .done-emoji { color:var(--purple); }
+.maze-complete .mc-emoji { color:var(--green); }
+.med-check-btn { border-color:#C9BFD3; }
+
+/* 도형 */
+.shape-btn { font-family:inherit; }
+.shape-btn .shape-icon { width:28px; height:28px; margin:0 auto 4px; display:block; font-size:0; }
+.shape-btn .shape-icon svg { width:100%; height:100%; }
+.shape-btn.active { border-color:var(--acc); background:var(--acc-soft); color:var(--acc); }
+.shape-score-item { background:var(--acc-soft); }
+.shape-score-item .ss-num { font-family:var(--serif); color:var(--acc); }
+.canvas-hint { background:var(--acc-soft); color:var(--acc); }
+.canvas-wrap { border:2px solid var(--line); background:#FFFDF8; }
+
+/* 미로 */
+.maze-info-item { background:var(--acc-soft); }
+.maze-info-item .mi-val { font-family:var(--serif); color:var(--acc); }
+.maze-diff-btn.active, .trail-btn.active { border-color:var(--acc); background:var(--acc-soft); color:var(--acc); }
+.maze-draw-hint { background:var(--acc-soft); color:var(--acc); border:1px solid var(--line); font-size:17px; }
+.maze-canvas-wrap { border:2px solid var(--line); background:#FFFDF8; }
+
+/* 안내 메시지 */
+.diary-toast { bottom:100px; background:var(--ink); }
+
+/* 마무리(칭찬·정리) 창 */
+.finish-sheet { padding:0 22px 24px; overflow-x:hidden; }
+.fs-photo { margin:0 -22px 16px; border-radius:28px 28px 0 0; overflow:hidden; background:#E9E1D1; }
+.fs-photo img { display:block; width:100%; aspect-ratio:16/10; object-fit:cover; }
+.fs-photo figcaption { background:#FAF7F0; padding:9px 14px; font-size:15px; color:var(--ink-soft); }
+.fs-title { font-family:var(--serif); font-size:26px; margin:6px 0 8px; }
+.fs-date { color:var(--primary); }
+.fs-row { background:#FAF7F0; border:1.5px solid var(--line); }
+.fs-row.done { background:var(--green-light); border-color:var(--green); }
+.fs-row .fs-ico { width:44px; height:44px; border-radius:12px; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:0; }
+.fs-row .fs-ico svg { width:24px; height:24px; }
+.fs-row .fs-mark { width:28px; height:28px; color:var(--green); font-size:0; }
+.fs-row .fs-mark svg { width:100%; height:100%; }
+.fs-go { border-color:var(--primary); color:var(--primary); }
+.fs-day.full { background:var(--green-light); }
+.fs-day .s { height:24px; display:flex; align-items:center; justify-content:center; font-size:0; }
+.fs-day.full .s { color:var(--green); }
+.fs-day .s svg { width:22px; height:22px; }
+.fs-day .dot { display:inline-block; width:10px; height:10px; border-radius:50%; background:#D8CFBD; }
+.fs-day .dot.half { background:#E3C27A; }
+.fs-bye { color:var(--primary); font-family:var(--serif); }
+.confetti span { font-size:0; border-radius:60% 0 60% 0; width:12px; height:16px; }
+
+/* ── 보정: 칸 넘침·줄바꿈 ── */
+body { word-break: keep-all; overflow-wrap: anywhere; }
+textarea, input { word-break: keep-all; }
+.sleep-grid { grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 12px; }
+.sleep-input-wrap input[type="time"] { font-size: 23px; padding: 12px 8px; min-width: 0; }
+.med-add-row input[type="text"] { min-width: 0; font-size: 19px; padding: 13px 14px; }
+.med-add-row .btn-purple { flex-shrink: 0; padding: 13px 16px; }
+.maze-draw-hint { color: var(--ink); }
+.result-msg, .fs-title, .fs-praise, .fc-msg, .done-msg, .canvas-hint, .maze-draw-hint, .fs-bye { text-wrap: balance; }
+.fs-title { font-size: 24px; }
+
+.sleep-input-wrap input[type="time"] { font-size: 20px; padding: 12px 6px; }
 </style>
 </head>
 <body>
 
 <header class="app-header">
-  <h1>🌸 마음돌봄</h1>
+  <h1><svg class="logo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="2.2"/><path d="M12 9.8c-2.6-1.2-2.6-5.3 0-6.3 2.6 1 2.6 5.1 0 6.3zM14.2 12c1.2-2.6 5.3-2.6 6.3 0-1 2.6-5.1 2.6-6.3 0zM12 14.2c2.6 1.2 2.6 5.3 0 6.3-2.6-1-2.6-5.1 0-6.3zM9.8 12c-1.2 2.6-5.3 2.6-6.3 0 1-2.6 5.1-2.6 6.3 0z"/></svg>마음돌봄</h1>
   <div class="subtitle">오늘도 건강하게 보내세요</div>
   <div class="header-date" id="headerDate"></div>
 </header>
 
 <nav class="tab-bar">
   <button class="tab-btn active" onclick="switchTab('home', this)">
-    <span class="tab-icon">🏠</span>홈
+    <span class="tab-icon"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9.5h13V10"/><path d="M10 19.5v-5h4v5"/></svg></span>홈
   </button>
   <button class="tab-btn" onclick="switchTab('sleep', this)">
-    <span class="tab-icon">🛏️</span>수면
+    <span class="tab-icon"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg></span>수면
   </button>
   <button class="tab-btn" onclick="switchTab('game', this)">
-    <span class="tab-icon">🧮</span>게임
+    <span class="tab-icon"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="3"/><path d="M8 9h5M10.5 6.5v5"/><path d="M8 16h8"/></svg></span>게임
   </button>
   <button class="tab-btn" onclick="switchTab('diary', this)">
-    <span class="tab-icon">📓</span>일기
+    <span class="tab-icon"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4.5A1.5 1.5 0 0 1 6.5 3H19v15H6.5A1.5 1.5 0 0 0 5 19.5z"/><path d="M5 19.5A1.5 1.5 0 0 0 6.5 21H19v-3"/><path d="M9 8h6M9 12h6"/></svg></span>일기
   </button>
   <button class="tab-btn" onclick="switchTab('med', this)">
-    <span class="tab-icon">💊</span>약
+    <span class="tab-icon"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"/><path d="m8.5 8.5 7 7"/></svg></span>약
   </button>
   <button class="tab-btn" onclick="switchTab('shape', this)">
-    <span class="tab-icon">✏️</span>도형
+    <span class="tab-icon"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5 16 10H8z"/><rect x="3.5" y="13.5" width="7" height="7" rx="1"/><circle cx="17" cy="17" r="3.8"/></svg></span>도형
   </button>
   <button class="tab-btn" onclick="switchTab('maze', this)">
-    <span class="tab-icon">🌀</span>미로
+    <span class="tab-icon"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="2"/><path d="M3.5 9.5h9v5h-5v6"/><path d="M12.5 3.5v3M20.5 14.5h-5v-5"/></svg></span>미로
   </button>
 </nav>
 
@@ -1013,70 +1271,82 @@
 
 <!-- ── 홈 패널 ── -->
 <div class="panel active" id="panel-home">
+  <figure class="hero" id="heroFig">
+    <img id="heroImg" alt="오늘의 꽃" onerror="this.closest('figure').style.display='none'">
+    <figcaption id="heroCap"></figcaption>
+  </figure>
   <div class="home-greeting">
-    <div class="big-emoji">☀️</div>
     <h2 id="greetingText">좋은 아침이에요!</h2>
     <p>오늘도 여섯 가지를 함께 해봐요</p>
   </div>
 
   <div class="daily-status">
-    <h3>✅ 오늘의 달성 현황</h3>
-    <div class="status-row" style="flex-wrap:wrap; gap:8px;">
-      <div class="status-badge" id="badge-sleep" style="min-width:calc(33% - 6px);"><span class="sb-icon">🛏️</span>수면체크</div>
-      <div class="status-badge" id="badge-game" style="min-width:calc(33% - 6px);"><span class="sb-icon">🧮</span>계산게임</div>
-      <div class="status-badge" id="badge-diary" style="min-width:calc(33% - 6px);"><span class="sb-icon">📓</span>오늘일기</div>
-      <div class="status-badge" id="badge-med" style="min-width:calc(33% - 6px);"><span class="sb-icon">💊</span>복약완료</div>
-      <div class="status-badge" id="badge-shape" style="min-width:calc(33% - 6px);"><span class="sb-icon">✏️</span>도형그리기</div>
-      <div class="status-badge" id="badge-maze" style="min-width:calc(33% - 6px);"><span class="sb-icon">🌀</span>미로찾기</div>
+    <h3>오늘의 달성 현황</h3>
+    <div class="status-row">
+      <div class="status-badge" id="badge-sleep"><span class="sb-icon"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg></span>수면체크</div>
+      <div class="status-badge" id="badge-game"><span class="sb-icon"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="3"/><path d="M8 9h5M10.5 6.5v5"/><path d="M8 16h8"/></svg></span>계산게임</div>
+      <div class="status-badge" id="badge-diary"><span class="sb-icon"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4.5A1.5 1.5 0 0 1 6.5 3H19v15H6.5A1.5 1.5 0 0 0 5 19.5z"/><path d="M5 19.5A1.5 1.5 0 0 0 6.5 21H19v-3"/><path d="M9 8h6M9 12h6"/></svg></span>오늘일기</div>
+      <div class="status-badge" id="badge-med"><span class="sb-icon"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"/><path d="m8.5 8.5 7 7"/></svg></span>복약완료</div>
+      <div class="status-badge" id="badge-shape"><span class="sb-icon"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5 16 10H8z"/><rect x="3.5" y="13.5" width="7" height="7" rx="1"/><circle cx="17" cy="17" r="3.8"/></svg></span>도형그리기</div>
+      <div class="status-badge" id="badge-maze"><span class="sb-icon"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="2"/><path d="M3.5 9.5h9v5h-5v6"/><path d="M12.5 3.5v3M20.5 14.5h-5v-5"/></svg></span>미로찾기</div>
     </div>
   </div>
 
+  <div class="finish-card" id="finishCard">
+    <div class="fc-top">
+      <div class="fc-count" id="fcCount">0 / 6</div>
+      <div class="fc-msg" id="fcMsg">오늘 활동을 시작해 볼까요?</div>
+    </div>
+    <div class="fc-bar"><div class="fc-bar-fill" id="fcBar"></div></div>
+    <button class="btn-finish" onclick="openFinish()">오늘 하루 정리하기</button>
+  </div>
+
   <div class="home-cards">
-    <div class="home-card sleep" onclick="switchTabByName('sleep')">
-      <span class="hc-icon">🛏️</span>
+    <div class="home-card" style="--acc:#46698C;--soft:#E6EEF6" onclick="switchTabByName('sleep')">
+      <span class="hc-icon"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg></span>
       <div class="hc-text">
         <h3>수면 체크</h3>
         <p>7시간 30분 목표를 채워요</p>
       </div>
       <span class="hc-arrow">›</span>
     </div>
-    <div class="home-card game" onclick="switchTabByName('game')">
-      <span class="hc-icon">🧮</span>
+    <div class="home-card" style="--acc:#B07A1F;--soft:#F7EEDC" onclick="switchTabByName('game')">
+      <span class="hc-icon"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="3"/><path d="M8 9h5M10.5 6.5v5"/><path d="M8 16h8"/></svg></span>
       <div class="hc-text">
         <h3>계산 게임</h3>
         <p>두뇌를 깨우는 덧셈·뺄셈 문제</p>
       </div>
       <span class="hc-arrow">›</span>
     </div>
-    <div class="home-card diary" onclick="switchTabByName('diary')">
-      <span class="hc-icon">📓</span>
+    <div class="home-card" style="--acc:#5A7D57;--soft:#E8F0E6" onclick="switchTabByName('diary')">
+      <span class="hc-icon"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4.5A1.5 1.5 0 0 1 6.5 3H19v15H6.5A1.5 1.5 0 0 0 5 19.5z"/><path d="M5 19.5A1.5 1.5 0 0 0 6.5 21H19v-3"/><path d="M9 8h6M9 12h6"/></svg></span>
       <div class="hc-text">
         <h3>세 줄 일기</h3>
-        <p>오늘 하루를 세 문장으로 기록해요</p>
+        <p>하루를 세 문장으로 기록해요</p>
       </div>
       <span class="hc-arrow">›</span>
     </div>
-    <div class="home-card" style="border-left-color: #7C5CBF;" onclick="switchTabByName('med')">
-      <span class="hc-icon">💊</span>
+    <div class="home-card" style="--acc:#7C5A8C;--soft:#EFE7F3" onclick="switchTabByName('med')">
+      <span class="hc-icon"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"/><path d="m8.5 8.5 7 7"/></svg></span>
       <div class="hc-text">
         <h3>약 복용 체크</h3>
-        <p>오늘 먹을 약을 빠짐없이 체크해요</p>
+        <p>오늘 먹을 약을 체크해요</p>
       </div>
       <span class="hc-arrow">›</span>
     </div>
-    <div class="home-card" style="border-left-color: #16A085;" onclick="switchTabByName('shape')">
-      <span class="hc-icon">✏️</span>
+    <div class="home-card" style="--acc:#2C7F78;--soft:#E2F1EF" onclick="switchTabByName('shape')">
+      <span class="hc-icon"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5 16 10H8z"/><rect x="3.5" y="13.5" width="7" height="7" rx="1"/><circle cx="17" cy="17" r="3.8"/></svg></span>
       <div class="hc-text">
         <h3>도형 따라그리기</h3>
         <p>손 근육과 집중력을 키워요</p>
       </div>
       <span class="hc-arrow">›</span>
     </div>
-    <div class="home-card" style="border-left-color: #D63384;" onclick="switchTabByName('maze')">
-      <span class="hc-icon">🌀</span>
+    <div class="home-card" style="--acc:#B2574C;--soft:#F7E6E3" onclick="switchTabByName('maze')">
+      <span class="hc-icon"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="2"/><path d="M3.5 9.5h9v5h-5v6"/><path d="M12.5 3.5v3M20.5 14.5h-5v-5"/></svg></span>
       <div class="hc-text">
         <h3>미로 찾기</h3>
-        <p>손가락으로 길을 따라 출구를 찾아요</p>
+        <p>손가락으로 출구를 찾아요</p>
       </div>
       <span class="hc-arrow">›</span>
     </div>
@@ -1086,7 +1356,7 @@
 <!-- ── 수면 체크 패널 ── -->
 <div class="panel" id="panel-sleep">
   <div class="card">
-    <div class="card-title">🛏️ 수면 시간 체크</div>
+    <div class="card-title">수면 시간 체크</div>
     <div class="sleep-grid">
       <div class="sleep-input-wrap">
         <label>취침 시간</label>
@@ -1100,7 +1370,7 @@
     <button class="btn-primary" onclick="checkSleep()">수면 시간 확인하기</button>
 
     <div class="sleep-result" id="sleepResult">
-      <div class="result-emoji" id="resultEmoji">😴</div>
+      <div class="result-emoji" id="resultEmoji"></div>
       <div class="result-hours" id="resultHours">–</div>
       <div class="result-label">동안 주무셨어요</div>
       <div class="result-msg" id="resultMsg"></div>
@@ -1108,11 +1378,11 @@
   </div>
 
   <div class="card">
-    <div class="card-title" style="font-size:18px;">💡 좋은 수면 습관</div>
+    <div class="card-title" style="font-size:18px;">좋은 수면 습관</div>
     <div class="sleep-tip">
       <strong>취침 전 1시간</strong>은 스마트폰을 멀리하세요.<br>
       매일 같은 시간에 자고 일어나면<br>
-      뇌 건강에 큰 도움이 됩니다. 🌙
+      뇌 건강에 큰 도움이 됩니다.
     </div>
   </div>
 </div>
@@ -1120,16 +1390,16 @@
 <!-- ── 계산 게임 패널 ── -->
 <div class="panel" id="panel-game">
   <div class="card">
-    <div class="card-title">🧮 두뇌 계산 게임</div>
+    <div class="card-title">두뇌 계산 게임</div>
 
     <div class="score-bar">
       <div class="score-item">
         <div class="score-num" id="scoreCorrect">0</div>
-        <div class="score-lbl">정답 ✅</div>
+        <div class="score-lbl">정답</div>
       </div>
       <div class="score-item">
         <div class="score-num" id="scoreWrong">0</div>
-        <div class="score-lbl">오답 ❌</div>
+        <div class="score-lbl">오답</div>
       </div>
       <div class="score-item">
         <div class="score-num" id="scoreTotal">0</div>
@@ -1172,7 +1442,7 @@
 <!-- ── 일기 패널 ── -->
 <div class="panel" id="panel-diary">
   <div class="card">
-    <div class="card-title">📓 오늘의 세 줄 일기</div>
+    <div class="card-title">오늘의 세 줄 일기</div>
     <div class="diary-date" id="diaryDate"></div>
 
     <div class="diary-lines">
@@ -1192,7 +1462,7 @@
 
     <div class="diary-save-row">
       <button class="btn-secondary" onclick="clearDiary()">지우기</button>
-      <button class="btn-save" onclick="saveDiary()">✅ 저장하기</button>
+      <button class="btn-save" onclick="saveDiary()">저장하기</button>
     </div>
   </div>
 
@@ -1202,14 +1472,14 @@
 <!-- ── 약 복용 체크 패널 ── -->
 <div class="panel" id="panel-med">
   <div class="card">
-    <div class="card-title">💊 약 복용 체크</div>
+    <div class="card-title">약 복용 체크</div>
 
     <!-- 복약 시간대 선택 -->
     <div class="med-time-select">
-      <button class="time-btn active" onclick="setMedTime('아침', this)">🌅 아침</button>
-      <button class="time-btn" onclick="setMedTime('점심', this)">☀️ 점심</button>
-      <button class="time-btn" onclick="setMedTime('저녁', this)">🌙 저녁</button>
-      <button class="time-btn" onclick="setMedTime('취침전', this)">😴 취침전</button>
+      <button class="time-btn active" onclick="setMedTime('아침', this)">아침</button>
+      <button class="time-btn" onclick="setMedTime('점심', this)">점심</button>
+      <button class="time-btn" onclick="setMedTime('저녁', this)">저녁</button>
+      <button class="time-btn" onclick="setMedTime('취침전', this)">취침전</button>
     </div>
 
     <!-- 약 이름 추가 -->
@@ -1229,14 +1499,14 @@
 
     <!-- 전체 완료 메시지 -->
     <div class="med-all-done" id="medAllDone">
-      <span class="done-emoji">🎉</span>
-      <div class="done-msg">오늘 약을 모두 드셨어요!<br>정말 잘 하셨어요 👏</div>
+      <span class="done-emoji"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8 12.3 2.8 2.8L16.2 9.6"/></svg></span>
+      <div class="done-msg">오늘 약을 모두 드셨어요!<br>정말 잘 하셨어요</div>
     </div>
   </div>
 
   <!-- 복약 기록 카드 -->
   <div class="card" id="medHistoryCard">
-    <div class="card-title" style="font-size:18px;">📋 오늘의 복약 기록</div>
+    <div class="card-title" style="font-size:18px;">오늘의 복약 기록</div>
     <div id="medHistorySummary"></div>
   </div>
 </div>
@@ -1244,21 +1514,21 @@
 <!-- ── 도형 따라그리기 패널 ── -->
 <div class="panel" id="panel-shape">
   <div class="card">
-    <div class="card-title">✏️ 도형 따라그리기</div>
+    <div class="card-title">도형 따라그리기</div>
 
     <!-- 점수 -->
     <div class="shape-score">
       <div class="shape-score-item"><div class="ss-num" id="shapeTryCount">0</div><div class="ss-lbl">도전 횟수</div></div>
-      <div class="shape-score-item"><div class="ss-num" id="shapeSuccessCount">0</div><div class="ss-lbl">성공 🎉</div></div>
+      <div class="shape-score-item"><div class="ss-num" id="shapeSuccessCount">0</div><div class="ss-lbl">성공</div></div>
       <div class="shape-score-item"><div class="ss-num" id="shapeBestScore">-</div><div class="ss-lbl">최고 정확도</div></div>
     </div>
 
     <!-- 도형 선택 -->
     <div class="shape-selector">
-      <button class="shape-btn active" onclick="selectShape('circle', this)"><span class="shape-icon">⭕</span>원</button>
-      <button class="shape-btn" onclick="selectShape('triangle', this)"><span class="shape-icon">🔺</span>삼각형</button>
-      <button class="shape-btn" onclick="selectShape('rect', this)"><span class="shape-icon">⬜</span>사각형</button>
-      <button class="shape-btn" onclick="selectShape('star', this)"><span class="shape-icon">⭐</span>별</button>
+      <button class="shape-btn active" onclick="selectShape('circle', this)"><span class="shape-icon"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8"/></svg></span>원</button>
+      <button class="shape-btn" onclick="selectShape('triangle', this)"><span class="shape-icon"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4 21 19H3z"/></svg></span>삼각형</button>
+      <button class="shape-btn" onclick="selectShape('rect', this)"><span class="shape-icon"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="14" rx="1.5"/></svg></span>사각형</button>
+      <button class="shape-btn" onclick="selectShape('star', this)"><span class="shape-icon"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3.5 2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 17l-5.4 3 1.2-6L3.3 9.8l6.1-.7z"/></svg></span>별</button>
     </div>
 
     <div class="canvas-hint" id="shapeHint">점선 위를 손가락으로 따라 그어보세요!</div>
@@ -1268,8 +1538,8 @@
     </div>
 
     <div class="shape-controls">
-      <button class="btn-outline-teal" onclick="clearShapeCanvas()">🗑️ 지우기</button>
-      <button class="btn-teal" onclick="checkShapeAccuracy()">✅ 채점하기</button>
+      <button class="btn-outline-teal" onclick="clearShapeCanvas()">지우기</button>
+      <button class="btn-teal" onclick="checkShapeAccuracy()">채점하기</button>
     </div>
 
     <div class="shape-result-box" id="shapeResultBox">
@@ -1281,10 +1551,10 @@
 <!-- ── 미로 찾기 패널 ── -->
 <div class="panel" id="panel-maze">
   <div class="card">
-    <div class="card-title">🌀 미로 찾기</div>
+    <div class="card-title">미로 찾기</div>
 
     <div class="maze-info-row">
-      <div class="maze-info-item"><div class="mi-val" id="mazeTimer">0</div><div class="mi-lbl">⏱️ 초</div></div>
+      <div class="maze-info-item"><div class="mi-val" id="mazeTimer">0</div><div class="mi-lbl">경과 시간(초)</div></div>
       <div class="maze-info-item"><div class="mi-val" id="mazeSolvedCount">0</div><div class="mi-lbl">완성 횟수</div></div>
       <div class="maze-info-item"><div class="mi-val" id="mazeBestTime">-</div><div class="mi-lbl">최고 기록(초)</div></div>
     </div>
@@ -1296,22 +1566,22 @@
     </div>
 
     <div class="maze-draw-hint" id="mazeHint">
-      ✏️ 😊 캐릭터에서 손가락을 대고<br>길을 따라 쭉 그어서 🏁 출구까지 가세요!
+      진한 초록 동그라미 위에 손가락을 대고,<br>길을 따라 붉은 과녁(출구)까지 쭉 그어 주세요.
     </div>
 
     <div class="maze-trail-toggle">
-      <button class="trail-btn active" id="trailOnBtn" onclick="setTrail(true, this)">🖊️ 경로 표시</button>
-      <button class="trail-btn" id="trailOffBtn" onclick="setTrail(false, this)">❌ 경로 숨기기</button>
+      <button class="trail-btn active" id="trailOnBtn" onclick="setTrail(true, this)">경로 표시</button>
+      <button class="trail-btn" id="trailOffBtn" onclick="setTrail(false, this)">경로 숨기기</button>
     </div>
 
-    <button class="btn-rose" onclick="generateMaze()">🔄 새 미로 만들기</button>
+    <button class="btn-rose" onclick="generateMaze()">새 미로 만들기</button>
 
     <div class="maze-canvas-wrap" style="margin-top:12px;">
       <canvas id="mazeCanvas"></canvas>
     </div>
 
     <div class="maze-complete" id="mazeComplete">
-      <span class="mc-emoji">🎉</span>
+      <span class="mc-emoji"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8 12.3 2.8 2.8L16.2 9.6"/></svg></span>
       <div class="mc-msg">미로를 탈출했어요!</div>
       <div class="mc-time" id="mazeCompleteTime"></div>
     </div>
@@ -1319,27 +1589,69 @@
 </div>
 
 
+<div class="finish-overlay" id="finishOverlay" role="dialog" aria-modal="true" onclick="if(event.target===this)closeFinish()">
+  <div class="confetti" id="confetti"></div>
+  <div class="finish-sheet">
+    <figure class="fs-photo" id="fsPhotoFig">
+      <img id="fsPhoto" alt="오늘의 꽃" onerror="this.closest('figure').style.display='none'">
+      <figcaption id="fsPhotoCap"></figcaption>
+    </figure>
+    <div class="fs-title" id="fsTitle"></div>
+    <div class="fs-praise" id="fsPraise"></div>
+    <div class="fs-date" id="fsDate"></div>
+    <div class="fs-list" id="fsList"></div>
+    <div class="fs-week-title">최근 7일</div>
+    <div class="fs-week" id="fsWeek"></div>
+    <div class="fs-week-sum" id="fsWeekSum"></div>
+    <div class="fs-bye" id="fsBye"></div>
+    <div class="fs-note">화면을 닫으셔도 오늘 기록은 이 폰에 저장돼요.</div>
+    <button class="btn-primary" onclick="closeFinish()">확인</button>
+  </div>
+</div>
+
 <div class="diary-toast" id="toast"></div>
 
 <script>
+const ICONS = {"home": "<svg class=\"ico\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M3 11.5 12 4l9 7.5\"/><path d=\"M5.5 10v9.5h13V10\"/><path d=\"M10 19.5v-5h4v5\"/></svg>", "sleep": "<svg class=\"ico\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z\"/></svg>", "game": "<svg class=\"ico\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect x=\"3.5\" y=\"3.5\" width=\"17\" height=\"17\" rx=\"3\"/><path d=\"M8 9h5M10.5 6.5v5\"/><path d=\"M8 16h8\"/></svg>", "diary": "<svg class=\"ico\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 4.5A1.5 1.5 0 0 1 6.5 3H19v15H6.5A1.5 1.5 0 0 0 5 19.5z\"/><path d=\"M5 19.5A1.5 1.5 0 0 0 6.5 21H19v-3\"/><path d=\"M9 8h6M9 12h6\"/></svg>", "med": "<svg class=\"ico\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z\"/><path d=\"m8.5 8.5 7 7\"/></svg>", "shape": "<svg class=\"ico\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 3.5 16 10H8z\"/><rect x=\"3.5\" y=\"13.5\" width=\"7\" height=\"7\" rx=\"1\"/><circle cx=\"17\" cy=\"17\" r=\"3.8\"/></svg>", "maze": "<svg class=\"ico\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect x=\"3.5\" y=\"3.5\" width=\"17\" height=\"17\" rx=\"2\"/><path d=\"M3.5 9.5h9v5h-5v6\"/><path d=\"M12.5 3.5v3M20.5 14.5h-5v-5\"/></svg>", "check": "<svg class=\"ico\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"m8 12.3 2.8 2.8L16.2 9.6\"/></svg>", "moon": "<svg class=\"ico\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z\"/></svg>", "pill": "<svg class=\"ico\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z\"/><path d=\"m8.5 8.5 7 7\"/></svg>", "circle": "<svg class=\"ico\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"8\"/></svg>", "triangle": "<svg class=\"ico\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 4 21 19H3z\"/></svg>", "rect": "<svg class=\"ico\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect x=\"4\" y=\"5\" width=\"16\" height=\"14\" rx=\"1.5\"/></svg>", "star": "<svg class=\"ico\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m12 3.5 2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 17l-5.4 3 1.2-6L3.3 9.8l6.1-.7z\"/></svg>", "flower": "<svg class=\"ico\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"2.2\"/><path d=\"M12 9.8c-2.6-1.2-2.6-5.3 0-6.3 2.6 1 2.6 5.1 0 6.3zM14.2 12c1.2-2.6 5.3-2.6 6.3 0-1 2.6-5.1 2.6-6.3 0zM12 14.2c2.6 1.2 2.6 5.3 0 6.3-2.6-1-2.6-5.1 0-6.3zM9.8 12c-1.2 2.6-5.3 2.6-6.3 0 1-2.6 5.1-2.6 6.3 0z\"/></svg>"};
+const FLOWERS = [
+  { file: 'flower1.webp', name: '하얀 데이지' },
+  { file: 'flower2.webp', name: '주황빛 백일홍' },
+  { file: 'flower3.webp', name: '노란 장미' },
+];
+function flowerOfToday() {
+  const d = new Date();
+  const day = Math.floor((d - new Date(d.getFullYear(), 0, 0)) / 86400000);
+  return FLOWERS[day % FLOWERS.length];
+}
+
 
 // ── 날짜 초기화 ──
 const today = new Date();
 const weekdays = ['일','월','화','수','목','금','토'];
 const dateStr = `${today.getFullYear()}년 ${today.getMonth()+1}월 ${today.getDate()}일 (${weekdays[today.getDay()]})`;
 document.getElementById('headerDate').textContent = dateStr;
-document.getElementById('diaryDate').textContent = '📅 ' + dateStr;
+document.getElementById('diaryDate').textContent = dateStr;
 const hour = today.getHours();
-const greet = hour < 12 ? '좋은 아침이에요! ☀️' : hour < 17 ? '좋은 오후예요! 🌤️' : '좋은 저녁이에요! 🌙';
+const greet = hour < 12 ? '좋은 아침이에요!' : hour < 17 ? '좋은 오후예요!' : '좋은 저녁이에요!';
 document.getElementById('greetingText').textContent = greet;
 
-// ── 달성 상태 (맨 먼저 선언) ──
-const doneSet = new Set(JSON.parse(sessionStorage.getItem('maumDone') || '[]'));
+// ── 날짜 키(한국 시간 기준)와 하루 기록 ──
+function localDateKey(d) {
+  d = d || new Date();
+  const p = n => String(n).padStart(2, '0');
+  return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate());
+}
+const DAY_PREFIX = 'maumDay_';
+const DAY_KEY = DAY_PREFIX + localDateKey();
+let appReady = false;
+let dayStats = {};
+try { dayStats = JSON.parse(localStorage.getItem(DAY_KEY) || '{}') || {}; } catch (e) { dayStats = {}; }
+function saveDay() {
+  try { localStorage.setItem(DAY_KEY, JSON.stringify(dayStats)); } catch (e) {}
+}
+// 각 활동을 하나 마칠 때마다 호출됩니다
 function markDone(key) {
-  doneSet.add(key);
-  sessionStorage.setItem('maumDone', JSON.stringify([...doneSet]));
-  const badge = document.getElementById('badge-' + key);
-  if (badge) badge.classList.add('done');
+  if (appReady) refreshFinish(true);
 }
 
 // ── 탭 전환 ──
@@ -1382,18 +1694,26 @@ function checkSleep() {
   const target = 7 * 60 + 30;
   const el = document.getElementById('sleepResult');
   el.className = 'sleep-result ' + (totalMins >= target ? 'success' : 'warn');
-  document.getElementById('resultEmoji').textContent = totalMins >= target ? '🌟' : '😴';
+  document.getElementById('resultEmoji').innerHTML = totalMins >= target ? ICONS.check : ICONS.moon;
   document.getElementById('resultHours').textContent = `${hours}시간 ${mins}분`;
   document.getElementById('resultMsg').textContent = totalMins >= target
-    ? '목표 달성! 정말 잘 주무셨어요! 👏'
+    ? '목표 달성! 정말 잘 주무셨어요!'
     : `목표까지 ${Math.ceil((target - totalMins) / 60 * 10) / 10}시간 더 주무시면 좋겠어요`;
-  if (totalMins >= target) markDone('sleep');
+  dayStats.sleep = { hours: hours, mins: mins, achieved: totalMins >= target };
+  saveDay();
+  markDone('sleep');
 }
 
 // ──────────────────────────────────
 // 2. 계산 게임
 // ──────────────────────────────────
 let gameState = { answer: null, input: '', correct: 0, wrong: 0, total: 0, range: 10, started: false };
+if (dayStats.game) {
+  gameState.correct = dayStats.game.correct || 0; gameState.wrong = dayStats.game.wrong || 0; gameState.total = dayStats.game.total || 0;
+  document.getElementById('scoreCorrect').textContent = gameState.correct;
+  document.getElementById('scoreWrong').textContent = gameState.wrong;
+  document.getElementById('scoreTotal').textContent = gameState.total;
+}
 
 function setDifficulty(level, btn) {
   document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('active'));
@@ -1441,14 +1761,17 @@ function submitAnswer() {
     gameState.correct++;
     document.getElementById('scoreCorrect').textContent = gameState.correct;
     fb.className = 'feedback-box correct';
-    fb.textContent = '🎉 정답이에요! 훌륭해요!';
+    fb.textContent = '정답이에요! 훌륭해요!';
     if (gameState.correct >= 3) markDone('game');
   } else {
     gameState.wrong++;
     document.getElementById('scoreWrong').textContent = gameState.wrong;
     fb.className = 'feedback-box wrong';
-    fb.textContent = `❌ 아쉬워요. 정답은 ${gameState.answer}이에요.`;
+    fb.textContent = `아쉬워요. 정답은 ${gameState.answer}이에요.`;
   }
+  dayStats.game = { correct: gameState.correct, wrong: gameState.wrong, total: gameState.total };
+  saveDay();
+  if (appReady) refreshFinish(true);
   setTimeout(nextQuestion, 1800);
 }
 nextQuestion();
@@ -1462,10 +1785,10 @@ function renderHistory() {
   const container = document.getElementById('diaryHistory');
   if (diaryEntries.length === 0) { container.innerHTML = ''; return; }
   const recent = [...diaryEntries].reverse().slice(0, 5);
-  container.innerHTML = `<div class="history-title">📚 최근 일기 기록</div>` +
+  container.innerHTML = `<div class="history-title">최근 일기 기록</div>` +
     recent.map(e =>
       `<div class="history-entry">
-        <div class="entry-date">📅 ${e.date}</div>
+        <div class="entry-date">${e.date}</div>
         <div class="entry-line">
           1. ${e.lines[0] || '(없음)'}<br>
           2. ${e.lines[1] || '(없음)'}<br>
@@ -1480,13 +1803,13 @@ function saveDiary() {
   const l1 = document.getElementById('line1').value.trim();
   const l2 = document.getElementById('line2').value.trim();
   const l3 = document.getElementById('line3').value.trim();
-  if (!l1 && !l2 && !l3) { showToast('한 줄이라도 써 주세요 😊'); return; }
+  if (!l1 && !l2 && !l3) { showToast('한 줄이라도 써 주세요'); return; }
   const entry = { date: dateStr, lines: [l1, l2, l3], ts: Date.now() };
   const idx = diaryEntries.findIndex(e => e.date === dateStr);
   if (idx >= 0) diaryEntries[idx] = entry;
   else diaryEntries.push(entry);
   localStorage.setItem('maumDiary', JSON.stringify(diaryEntries));
-  showToast('📓 일기를 저장했어요! 잘 하셨어요 👏');
+  showToast('일기를 저장했어요. 잘 하셨어요!');
   markDone('diary');
   renderHistory();
 }
@@ -1505,7 +1828,7 @@ if (diaryEntries.find(e => e.date === dateStr)) {
 // ──────────────────────────────────
 // 4. 약 복용 체크
 // ──────────────────────────────────
-const MED_KEY = 'maumMeds_' + today.toISOString().slice(0,10);
+const MED_KEY = 'maumMeds_' + localDateKey();
 let medData = JSON.parse(localStorage.getItem(MED_KEY) || 'null') || {
   아침: [], 점심: [], 저녁: [], 취침전: []
 };
@@ -1521,7 +1844,7 @@ function setMedTime(time, btn) {
 function addMed() {
   const input = document.getElementById('medNameInput');
   const name = input.value.trim();
-  if (!name) { showToast('약 이름을 입력해 주세요 💊'); return; }
+  if (!name) { showToast('약 이름을 입력해 주세요'); return; }
   if (medData[currentMedTime].find(m => m.name === name)) {
     showToast('이미 추가된 약이에요'); return;
   }
@@ -1553,6 +1876,7 @@ function deleteMed(idx) {
 
 function saveMedData() {
   localStorage.setItem(MED_KEY, JSON.stringify(medData));
+  if (appReady) refreshFinish(true);
 }
 
 function renderMedList() {
@@ -1566,7 +1890,7 @@ function renderMedList() {
   const allDoneEl = document.getElementById('medAllDone');
   allDoneEl.className = 'med-all-done' + (total > 0 && takenCount === total ? ' show' : '');
   if (list.length === 0) {
-    container.innerHTML = `<div class="med-empty"><span class="med-empty-icon">💊</span>위에서 약 이름을 추가해 주세요</div>`;
+    container.innerHTML = `<div class="med-empty"><span class="med-empty-icon">${ICONS.pill}</span>위에서 약 이름을 추가해 주세요</div>`;
     return;
   }
   container.innerHTML = list.map((med, i) => `
@@ -1574,8 +1898,8 @@ function renderMedList() {
       <button class="med-check-btn" onclick="toggleMed(${i})">${med.taken ? '✓' : ''}</button>
       <div class="med-info">
         <div class="med-name">${med.name}</div>
-        <div class="med-meta">💊 ${currentMedTime} 복약</div>
-        ${med.takenAt ? `<div class="med-taken-time">✅ ${med.takenAt}에 복용했어요</div>` : ''}
+        <div class="med-meta">${currentMedTime} 복약</div>
+        ${med.takenAt ? `<div class="med-taken-time">${med.takenAt}에 복용했어요</div>` : ''}
       </div>
       <button class="med-del-btn" onclick="deleteMed(${i})">✕</button>
     </div>`).join('');
@@ -1583,7 +1907,7 @@ function renderMedList() {
 
 function renderMedHistory() {
   const times = ['아침','점심','저녁','취침전'];
-  const icons = { 아침:'🌅', 점심:'☀️', 저녁:'🌙', 취침전:'😴' };
+  const icons = { 아침:'', 점심:'', 저녁:'', 취침전:'' };
   const summaryEl = document.getElementById('medHistorySummary');
   const rows = times.map(t => {
     const meds = medData[t];
@@ -1592,7 +1916,7 @@ function renderMedHistory() {
       <div style="font-size:16px;font-weight:700;color:#4A5A6B;margin-bottom:8px;">${icons[t]} ${t}</div>
       ${meds.map(m => `
         <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:${m.taken?'#E8F7F0':'#F7F4FF'};border-radius:12px;margin-bottom:6px;border:2px solid ${m.taken?'#4CAF82':'#DDD0F5'};">
-          <span style="font-size:20px;">${m.taken?'✅':'⬜'}</span>
+          <span style="font-size:20px;">${m.taken?'✓':'○'}</span>
           <span style="font-size:18px;font-weight:600;color:${m.taken?'#2E8B5A':'#1A2B3C'};${m.taken?'text-decoration:line-through;':''}">${m.name}</span>
           ${m.takenAt?`<span style="font-size:13px;color:#4CAF82;margin-left:auto;">${m.takenAt}</span>`:''}
         </div>`).join('')}
@@ -1620,6 +1944,12 @@ let currentShape = 'circle';
 let isDrawing = false;
 let userPath = [];
 let shapeStats = { tries: 0, success: 0, best: 0 };
+if (dayStats.shape) {
+  shapeStats = { tries: dayStats.shape.tries || 0, success: dayStats.shape.success || 0, best: dayStats.shape.best || 0 };
+  document.getElementById('shapeTryCount').textContent = shapeStats.tries;
+  document.getElementById('shapeSuccessCount').textContent = shapeStats.success;
+  document.getElementById('shapeBestScore').textContent = shapeStats.best ? shapeStats.best + '%' : '-';
+}
 
 function resizeShapeCanvas() {
   const w = shapeCanvas.parentElement.clientWidth - 6;
@@ -1670,7 +2000,7 @@ function getShapePath(shape, w, h) {
 function drawGuideShape() {
   const w = shapeCanvas.width, h = shapeCanvas.height;
   shapeCtx.clearRect(0, 0, w, h);
-  shapeCtx.fillStyle = '#F8FDFF';
+  shapeCtx.fillStyle = '#FFFDF8';
   shapeCtx.fillRect(0, 0, w, h);
 
   const pts = getShapePath(currentShape, w, h);
@@ -1712,7 +2042,7 @@ shapeCanvas.addEventListener('mousemove', e => {
     const prev = userPath[userPath.length - 2];
     shapeCtx.beginPath();
     shapeCtx.lineWidth = 4;
-    shapeCtx.strokeStyle = '#E8624A';
+    shapeCtx.strokeStyle = '#B5483D';
     shapeCtx.lineJoin = 'round';
     shapeCtx.lineCap = 'round';
     shapeCtx.moveTo(prev.x, prev.y);
@@ -1731,7 +2061,7 @@ shapeCanvas.addEventListener('touchmove', e => {
     const prev = userPath[userPath.length - 2];
     shapeCtx.beginPath();
     shapeCtx.lineWidth = 4;
-    shapeCtx.strokeStyle = '#E8624A';
+    shapeCtx.strokeStyle = '#B5483D';
     shapeCtx.lineJoin = 'round';
     shapeCtx.lineCap = 'round';
     shapeCtx.moveTo(prev.x, prev.y);
@@ -1748,7 +2078,7 @@ function clearShapeCanvas() {
 }
 
 function checkShapeAccuracy() {
-  if (userPath.length < 20) { showToast('조금 더 그려주세요 ✏️'); return; }
+  if (userPath.length < 20) { showToast('조금 더 그려 주세요'); return; }
   const w = shapeCanvas.width, h = shapeCanvas.height;
   // 안내선과 내가 그린 선을 촘촘한 점으로 나눠서 비교합니다
   const densify = (pts, step) => {
@@ -1795,17 +2125,20 @@ function checkShapeAccuracy() {
     document.getElementById('shapeBestScore').textContent = accuracy + '%';
   }
 
+  dayStats.shape = { tries: shapeStats.tries, success: shapeStats.success, best: shapeStats.best };
+  saveDay();
+  if (appReady) refreshFinish(true);
   const rb = document.getElementById('shapeResultBox');
   const rm = document.getElementById('shapeResultMsg');
   if (accuracy >= 80) {
     rb.className = 'shape-result-box show great';
-    rm.textContent = `🌟 정확도 ${accuracy}% — 훌륭해요!`;
+    rm.textContent = `정확도 ${accuracy}% — 훌륭해요!`;
   } else if (accuracy >= 60) {
     rb.className = 'shape-result-box show good';
-    rm.textContent = `👍 정확도 ${accuracy}% — 잘 하셨어요!`;
+    rm.textContent = `정확도 ${accuracy}% — 잘 하셨어요!`;
   } else {
     rb.className = 'shape-result-box show try';
-    rm.textContent = `💪 정확도 ${accuracy}% — 다시 도전해봐요!`;
+    rm.textContent = `정확도 ${accuracy}% — 다시 도전해 봐요!`;
   }
 }
 
@@ -1827,6 +2160,12 @@ let mazeTimerVal   = 0;
 let mazeTimerInt   = null;
 let mazeSolved     = 0;
 let mazeBest       = Infinity;
+if (dayStats.maze) {
+  mazeSolved = dayStats.maze.solved || 0;
+  if (dayStats.maze.best != null) mazeBest = dayStats.maze.best;
+  document.getElementById('mazeSolvedCount').textContent = mazeSolved;
+  document.getElementById('mazeBestTime').textContent = mazeBest === Infinity ? '-' : mazeBest;
+}
 let mazeRunning    = false;
 let mazeFinished   = false;
 let showTrail      = true;
@@ -1888,7 +2227,7 @@ function generateMaze() {
   lastCell      = null;
   document.getElementById('mazeTimer').textContent  = '0';
   document.getElementById('mazeComplete').className = 'maze-complete';
-  document.getElementById('mazeHint').textContent   = '✏️ 😊 캐릭터에서 손가락을 대고 길을 따라 쭉 그어서 🏁 출구까지 가세요!';
+  document.getElementById('mazeHint').textContent   = '진한 초록 동그라미 위에 손가락을 대고, 길을 따라 붉은 과녁(출구)까지 쭉 그어 주세요.';
 
   const N = mazeSize;
   mazeGrid = Array.from({ length: N }, () =>
@@ -1933,31 +2272,34 @@ function drawMaze() {
   mazeCtx.clearRect(0, 0, w, w);
 
   /* 배경 */
-  mazeCtx.fillStyle = '#FFF5FA';
+  mazeCtx.fillStyle = '#FFFDF8';
   mazeCtx.fillRect(0, 0, w, w);
 
   /* 방문 셀 하이라이트 */
   if (showTrail) {
     visitedCells.forEach(c => {
-      mazeCtx.fillStyle = 'rgba(214,51,132,0.10)';
+      mazeCtx.fillStyle = 'rgba(178,87,76,0.10)';
       mazeCtx.fillRect(c.x * cs + 1, c.y * cs + 1, cs - 2, cs - 2);
     });
   }
 
-  /* 목표 칸 */
-  mazeCtx.fillStyle = '#FFD6EC';
+  /* 목표 칸: 붉은 과녁 */
+  mazeCtx.fillStyle = '#F7E6E3';
   mazeCtx.fillRect((N-1)*cs+2, (N-1)*cs+2, cs-4, cs-4);
-  mazeCtx.font          = `${cs*0.52}px serif`;
-  mazeCtx.textAlign     = 'center';
-  mazeCtx.textBaseline  = 'middle';
-  mazeCtx.fillText('🏁', (N-1)*cs + cs/2, (N-1)*cs + cs/2);
+  const gx = (N-1)*cs + cs/2, gy = (N-1)*cs + cs/2;
+  mazeCtx.strokeStyle = '#B2574C';
+  mazeCtx.lineWidth = Math.max(2, cs * 0.06);
+  mazeCtx.beginPath(); mazeCtx.arc(gx, gy, cs * 0.30, 0, Math.PI*2); mazeCtx.stroke();
+  mazeCtx.beginPath(); mazeCtx.arc(gx, gy, cs * 0.17, 0, Math.PI*2); mazeCtx.stroke();
+  mazeCtx.fillStyle = '#B2574C';
+  mazeCtx.beginPath(); mazeCtx.arc(gx, gy, cs * 0.07, 0, Math.PI*2); mazeCtx.fill();
 
   /* 시작점 표시 */
-  mazeCtx.fillStyle = 'rgba(44,111,172,0.12)';
+  mazeCtx.fillStyle = 'rgba(31,95,91,0.12)';
   mazeCtx.fillRect(1, 1, cs-2, cs-2);
 
   /* 벽 */
-  mazeCtx.strokeStyle = '#D63384';
+  mazeCtx.strokeStyle = '#8F4036';
   mazeCtx.lineWidth   = Math.max(2.5, cs * 0.09);
   mazeCtx.lineCap     = 'round';
   for (let y = 0; y < N; y++) {
@@ -1978,7 +2320,7 @@ function drawMaze() {
     mazeCtx.beginPath();
     mazeCtx.moveTo(drawPath[0].cx, drawPath[0].cy);
     drawPath.forEach(p => mazeCtx.lineTo(p.cx, p.cy));
-    mazeCtx.strokeStyle   = 'rgba(214,51,132,0.55)';
+    mazeCtx.strokeStyle   = 'rgba(178,87,76,0.5)';
     mazeCtx.lineWidth     = Math.max(4, cs * 0.18);
     mazeCtx.lineCap       = 'round';
     mazeCtx.lineJoin      = 'round';
@@ -1986,17 +2328,16 @@ function drawMaze() {
     mazeCtx.stroke();
   }
 
-  /* 플레이어 */
+  /* 현재 위치: 진한 초록 동그라미 */
   const ppx = playerPos.x * cs + cs/2;
   const ppy = playerPos.y * cs + cs/2;
   mazeCtx.beginPath();
-  mazeCtx.arc(ppx, ppy, cs * 0.28, 0, Math.PI*2);
-  mazeCtx.fillStyle = 'rgba(44,111,172,0.18)';
+  mazeCtx.arc(ppx, ppy, cs * 0.26, 0, Math.PI*2);
+  mazeCtx.fillStyle = '#1F5F5B';
   mazeCtx.fill();
-  mazeCtx.font         = `${cs*0.46}px serif`;
-  mazeCtx.textAlign    = 'center';
-  mazeCtx.textBaseline = 'middle';
-  mazeCtx.fillText('😊', ppx, ppy + cs*0.03);
+  mazeCtx.lineWidth = Math.max(2, cs * 0.05);
+  mazeCtx.strokeStyle = '#FFFFFF';
+  mazeCtx.stroke();
 }
 
 /* ── 이동 처리 ── */
@@ -2037,8 +2378,10 @@ function tryMoveToCell(cell) {
       mazeBest = mazeTimerVal;
       document.getElementById('mazeBestTime').textContent = mazeBest;
     }
-    document.getElementById('mazeCompleteTime').textContent = `⏱️ ${mazeTimerVal}초 만에 탈출!`;
+    document.getElementById('mazeCompleteTime').textContent = `${mazeTimerVal}초 만에 탈출!`;
     document.getElementById('mazeComplete').className = 'maze-complete show';
+    dayStats.maze = { solved: mazeSolved, best: (mazeBest === Infinity ? null : mazeBest) };
+    saveDay();
     markDone('maze');
     document.getElementById('badge-maze').classList.add('done');
   }
@@ -2053,16 +2396,16 @@ function onDrawStart(e) {
   const cell = pixelToCell(cx, cy);
   const cs   = cellSize();
 
-  // 😊 캐릭터(현재 플레이어) 위 또는 근처에서만 시작 허용
+  // 현재 위치(초록 동그라미) 위 또는 근처에서만 시작 허용
   const ppx = playerPos.x * cs + cs/2;
   const ppy = playerPos.y * cs + cs/2;
   const dist = Math.hypot(cx - ppx, cy - ppy);
   if (dist > cs * 0.7) {
     // 시작점이 아니면 안내 메시지
-    document.getElementById('mazeHint').textContent = '😊 캐릭터 위에서 시작해 주세요!';
+    document.getElementById('mazeHint').textContent = '초록 동그라미 위에서 시작해 주세요.';
     return;
   }
-  document.getElementById('mazeHint').textContent = '✏️ 그대로 손가락을 떼지 말고 이동하세요!';
+  document.getElementById('mazeHint').textContent = '손가락을 떼지 말고 길을 따라 이동하세요.';
 
   mazeDrawing = true;
   drawPath  = [{ cx, cy }];
@@ -2090,7 +2433,7 @@ function onDrawEnd(e) {
   e.preventDefault();
   mazeDrawing = false;
   if (!mazeFinished) {
-    document.getElementById('mazeHint').textContent = '✏️ 😊 캐릭터에서 다시 시작하세요!';
+    document.getElementById('mazeHint').textContent = '초록 동그라미 위에서 다시 시작하세요.';
   }
 }
 
@@ -2117,6 +2460,148 @@ document.addEventListener('keydown', e => {
 // 초기화
 setTimeout(() => { resizeMazeCanvas(); generateMaze(); }, 200);
 window.addEventListener('resize', () => { resizeMazeCanvas(); drawMaze(); });
-</script>
-</body>
-</html>
+
+
+// ──────────────────────────────────
+// 7. 오늘의 칭찬과 정리
+// ──────────────────────────────────
+const ACTS = [
+  { key: 'sleep', icon: ICONS.sleep, color: '#46698C', soft: '#E6EEF6', name: '수면 체크', tab: 'sleep' },
+  { key: 'game', icon: ICONS.game, color: '#B07A1F', soft: '#F7EEDC', name: '계산 게임', tab: 'game' },
+  { key: 'diary', icon: ICONS.diary, color: '#5A7D57', soft: '#E8F0E6', name: '세 줄 일기', tab: 'diary' },
+  { key: 'med', icon: ICONS.med, color: '#7C5A8C', soft: '#EFE7F3', name: '약 복용 체크', tab: 'med' },
+  { key: 'shape', icon: ICONS.shape, color: '#2C7F78', soft: '#E2F1EF', name: '도형 따라그리기', tab: 'shape' },
+  { key: 'maze', icon: ICONS.maze, color: '#B2574C', soft: '#F7E6E3', name: '미로 찾기', tab: 'maze' }
+];
+
+function todayDiary() { return diaryEntries.find(e => e.date === dateStr); }
+function medCounts() {
+  const all = Object.values(medData).flat();
+  return { total: all.length, taken: all.filter(m => m.taken).length };
+}
+function isDone(key) {
+  if (key === 'sleep') return !!dayStats.sleep;
+  if (key === 'game')  return !!(dayStats.game && dayStats.game.correct >= 3);
+  if (key === 'diary') return !!todayDiary();
+  if (key === 'med')   { const c = medCounts(); return c.total > 0 && c.taken === c.total; }
+  if (key === 'shape') return !!(dayStats.shape && dayStats.shape.success >= 1);
+  if (key === 'maze')  return !!(dayStats.maze && dayStats.maze.solved >= 1);
+  return false;
+}
+function resultText(key) {
+  if (key === 'sleep') {
+    const s = dayStats.sleep;
+    return s ? s.hours + '시간 ' + s.mins + '분 주무셨어요' + (s.achieved ? ' (목표 달성)' : '') : '아직 기록 전이에요';
+  }
+  if (key === 'game') {
+    const g = dayStats.game;
+    if (!g || !g.total) return '아직 안 했어요';
+    return g.correct + '문제 맞혔어요 (총 ' + g.total + '문제)' + (g.correct >= 3 ? '' : ' · 3문제를 맞히면 완료예요');
+  }
+  if (key === 'diary') {
+    const e = todayDiary();
+    if (!e) return '아직 안 썼어요';
+    const first = (e.lines.find(l => l && l.trim()) || '').trim();
+    return first ? '“' + (first.length > 22 ? first.slice(0, 22) + '…' : first) + '”' : '일기를 저장했어요';
+  }
+  if (key === 'med') {
+    const c = medCounts();
+    if (c.total === 0) return '등록한 약이 없어요';
+    return c.taken + ' / ' + c.total + '개 복용했어요';
+  }
+  if (key === 'shape') {
+    const s = dayStats.shape;
+    if (!s || !s.tries) return '아직 안 했어요';
+    return s.success >= 1 ? '최고 ' + s.best + '% 로 성공했어요' : '최고 ' + s.best + '% · 60% 이상이면 성공이에요';
+  }
+  if (key === 'maze') {
+    const m = dayStats.maze;
+    if (!m || !m.solved) return '아직 안 했어요';
+    return m.solved + '번 탈출했어요' + (m.best != null ? ' (최고 ' + m.best + '초)' : '');
+  }
+  return '';
+}
+function countDone() { return ACTS.filter(a => isDone(a.key)).length; }
+
+function praiseFor(n) {
+  if (n >= ACTS.length) return { emoji: '', title: '오늘 활동을 모두 마치셨어요!', text: '정말 훌륭해요. 오늘 하루도 아주 잘 보내셨어요.' };
+  if (n === ACTS.length - 1) return { emoji: '', title: '거의 다 오셨어요!', text: '딱 한 가지만 더 하면 오늘 활동이 모두 끝나요.' };
+  if (n >= 3) return { emoji: '', title: '절반을 넘게 하셨어요!', text: '꾸준히 하시는 모습이 정말 멋져요. 참 잘하고 계세요.' };
+  if (n >= 1) return { emoji: '', title: '좋은 시작이에요!', text: '벌써 ' + n + '가지나 하셨어요. 천천히 해도 괜찮아요.' };
+  return { emoji: '', title: '아직 시작 전이에요', text: '부담 갖지 마시고 한 가지만 해 봐도 충분해요.' };
+}
+
+function refreshFinish(fromUser) {
+  ACTS.forEach(a => {
+    const b = document.getElementById('badge-' + a.key);
+    if (b) b.classList.toggle('done', isDone(a.key));
+  });
+  const n = countDone();
+  const total = ACTS.length;
+  dayStats.count = n;
+  dayStats.allDone = (n === total);
+  saveDay();
+  document.getElementById('fcCount').textContent = n + ' / ' + total;
+  document.getElementById('fcBar').style.width = Math.round(n / total * 100) + '%';
+  document.getElementById('fcMsg').textContent = n === total ? '모두 마치셨어요!' : n === 0 ? '오늘 활동을 시작해 볼까요?' : n + '가지 완료! 잘하고 있어요';
+  if (fromUser && n === total && !dayStats.celebrated) {
+    dayStats.celebrated = true;
+    saveDay();
+    setTimeout(openFinish, 1000);
+  }
+}
+
+function startConfetti() {
+  const box = document.getElementById('confetti');
+  box.innerHTML = '';
+  const cols = ['#F2C94C', '#E8805A', '#F4EFE4', '#9DBF9E', '#F2A9A0', '#C9B6E4'];
+  for (let k = 0; k < 24; k++) {
+    const s = document.createElement('span');
+    s.style.background = cols[k % cols.length];
+    s.style.left = (Math.random() * 96) + '%';
+    const sz = 9 + Math.random() * 8;
+    s.style.width = sz + 'px'; s.style.height = (sz * 1.3) + 'px';
+    s.style.animationDuration = (3 + Math.random() * 3) + 's';
+    s.style.animationDelay = (Math.random() * 1.5) + 's';
+    box.appendChild(s);
+  }
+  setTimeout(() => { box.innerHTML = ''; }, 7500);
+}
+
+function openFinish() {
+  const n = countDone();
+  const total = ACTS.length;
+  const pr = praiseFor(n);
+  const fl = flowerOfToday();
+  document.getElementById('fsPhotoFig').style.display = '';
+  document.getElementById('fsPhoto').src = fl.file;
+  document.getElementById('fsPhotoCap').textContent = (n === total ? '오늘의 선물 · ' : '오늘의 꽃 · ') + fl.name;
+  document.getElementById('fsTitle').textContent = pr.title;
+  document.getElementById('fsPraise').textContent = pr.text;
+  document.getElementById('fsDate').textContent = dateStr + ' · ' + n + ' / ' + total;
+
+  const list = document.getElementById('fsList');
+  list.innerHTML = '';
+  ACTS.forEach(a => {
+    const done = isDone(a.key);
+    const row = document.createElement('div');
+    row.className = 'fs-row' + (done ? ' done' : '');
+    const ico = document.createElement('div'); ico.className = 'fs-ico'; ico.innerHTML = a.icon; ico.style.color = a.color; ico.style.background = a.soft;
+    const txt = document.createElement('div'); txt.className = 'fs-txt';
+    const nm = document.createElement('div'); nm.className = 'fs-name'; nm.textContent = a.name;
+    const rs = document.createElement('div'); rs.className = 'fs-res'; rs.textContent = resultText(a.key);
+    txt.appendChild(nm); txt.appendChild(rs);
+    row.appendChild(ico); row.appendChild(txt);
+    if (done) {
+      const mk = document.createElement('div'); mk.className = 'fs-mark'; mk.innerHTML = ICONS.check;
+      row.appendChild(mk);
+    } else {
+      const go = document.createElement('button'); go.className = 'fs-go'; go.textContent = '하러 가기 ›';
+      go.onclick = function () { closeFinish(); switchTabByName(a.tab); window.scrollTo(0, 0); };
+      row.appendChild(go);
+    }
+    list.appendChild(row);
+  });
+
+  // 최근 7일
+  const week = document.getElementBy
