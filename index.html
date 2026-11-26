@@ -2604,4 +2604,54 @@ function openFinish() {
   });
 
   // 최근 7일
-  const week = document.getElementBy
+  const week = document.getElementById('fsWeek');
+  week.innerHTML = '';
+  let fullDays = 0;
+  for (let k = 6; k >= 0; k--) {
+    const d = new Date(); d.setDate(d.getDate() - k);
+    let rec = {};
+    if (k === 0) rec = dayStats;
+    else { try { rec = JSON.parse(localStorage.getItem(DAY_PREFIX + localDateKey(d)) || '{}') || {}; } catch (e) { rec = {}; } }
+    const full = !!rec.allDone;
+    if (full) fullDays++;
+    const cell = document.createElement('div');
+    cell.className = 'fs-day' + (full ? ' full' : '');
+    const dd = document.createElement('div'); dd.className = 'd'; dd.textContent = weekdays[d.getDay()];
+    const ss = document.createElement('div'); ss.className = 's'; ss.innerHTML = full ? ICONS.check : (rec.count > 0 ? '<span class="dot half"></span>' : '<span class="dot"></span>');
+    cell.appendChild(dd); cell.appendChild(ss);
+    week.appendChild(cell);
+  }
+  document.getElementById('fsWeekSum').textContent = '최근 7일 중 ' + fullDays + '일 모두 마쳤어요';
+
+  const h = new Date().getHours();
+  document.getElementById('fsBye').textContent = (h >= 18 || h < 5)
+    ? '오늘도 수고하셨어요. 편안한 밤 보내세요.'
+    : '오늘도 수고하셨어요. 내일 또 만나요.';
+
+  document.getElementById('finishOverlay').classList.add('show');
+  document.querySelector('.finish-sheet').scrollTop = 0;
+  if (n === total) startConfetti();
+}
+function closeFinish() {
+  document.getElementById('finishOverlay').classList.remove('show');
+  document.getElementById('confetti').innerHTML = '';
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeFinish(); });
+
+// 오늘의 꽃 사진(홈 화면)
+(function () {
+  const f = flowerOfToday();
+  const img = document.getElementById('heroImg');
+  img.src = f.file; img.alt = f.name + ' 사진';
+  const cap = document.getElementById('heroCap');
+  cap.textContent = '오늘의 꽃 · ';
+  const bold = document.createElement('b'); bold.textContent = f.name; cap.appendChild(bold);
+})();
+
+// 모든 준비가 끝난 뒤 현재 상태를 화면에 반영
+appReady = true;
+refreshFinish(false);
+
+</script>
+</body>
+</html>
